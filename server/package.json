@@ -1,15 +1,16 @@
 {
-	"name": "lsp-sample-server",
-	"description": "Example implementation of a language server in node.",
-	"version": "1.0.0",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"engines": {
-		"node": "*"
-	},
+	"name": "mindes-lsp",
+	"description": "A simple language server for MInDes script",
+	"author": "AMoment",
+	"license": "WTFPL",
+	"version": "0.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/A-moment096/MInDes-LSP"
+	},
+	"publisher": "AMoment",
+	"engines": {
+		"node": "*"
 	},
 	"dependencies": {
 		"vscode-languageserver": "^9.0.1",

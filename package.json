@@ -3,7 +3,7 @@
 	"description": "A simple language server for MInDes script",
 	"author": "AMoment",
 	"license": "WTFPL",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/A-moment096/MInDes-LSP"
