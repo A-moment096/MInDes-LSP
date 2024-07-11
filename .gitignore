@@ -1,4 +1,6 @@
 out
+.gitignore
 node_modules
 client/server
 .vscode-test
+mindes-lsp-*

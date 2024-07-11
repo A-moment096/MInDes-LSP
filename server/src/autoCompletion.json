@@ -1,24 +1,25 @@
 {
 	"": [
-        {"label": "InputFile", "detail": " Input File Settings", "documentation": "Settings related to the input file."},
-        {"label": "Solver", "detail": " Solver Settings", "documentation": "Settings related to the solver."},
-        {"label": "Postprocess", "detail": " Postprocessing Settings", "documentation": "Settings related to postprocessing."},
-        {"label": "Preprocess", "detail": " Preprocessing Settings", "documentation": "Settings related to preprocessing."},
-        {"label": "ModelsManager", "detail": " Models Manager Settings", "documentation": "Settings related to models management."},
-        {"label": "Define", "detail": " Define Variables and Functions", "documentation": "Define custom variables and functions."}
+        {"label": "InputFile", "detail": " Input File Settings"},
+        {"label": "Solver", "detail": " Solver Settings"},
+        {"label": "Postprocess", "detail": " Postprocessing Settings"},
+        {"label": "Preprocess", "detail": " Preprocessing Settings"},
+        {"label": "ModelsManager", "detail": " Models Manager Settings"},
+        {"label": "Define", "detail": " Define Variables and Functions"},
+        {"label":"INCLUDE","detail":" Paste the file from /path/"}
     ],
     "InputFile": [
-        {"label": "debug", "detail": " Debug Mode", "documentation": "Enable or disable debug mode."}
+        {"label": "debug", "detail": " Debug Mode"}
     ],
     "Solver": [
-        {"label": "Loop", "detail": " Solver Loop Settings", "documentation": "Settings for the solver loop."},
-        {"label": "Phi", "detail": " Phi Settings", "documentation": "Settings for Phi normalization."},
-        {"label": "Con", "detail": " Con Settings", "documentation": "Settings for Con normalization."},
-        {"label": "PCT", "detail": " PCT Settings", "documentation": "Settings for PCT increments."},
-        {"label": "Parallel", "detail": " Parallel Processing Settings", "documentation": "Settings for parallel processing."},
-        {"label": "Mesh", "detail": " Mesh Settings", "documentation": "Settings for the mesh configuration."},
-        {"label": "Phases", "detail": " Phases Definition", "documentation": "Definition of phases in the solver."},
-        {"label": "Comps", "detail": " Components Definition", "documentation": "Definition of components in the solver."}
+        {"label": "Loop", "detail": " Solver Loop Settings"},
+        {"label": "Phi", "detail": " Phi Settings"},
+        {"label": "Con", "detail": " Con Settings"},
+        {"label": "PCT", "detail": " PCT Settings"},
+        {"label": "Parallel", "detail": " Parallel Processing Settings"},
+        {"label": "Mesh", "detail": " Mesh Settings"},
+        {"label": "Phases", "detail": " Phases Definition"},
+        {"label": "Comps", "detail": " Components Definition"}
     ],
     "Solver.Phi": ["is_normalize"],
     "Solver.Con": ["is_normalize"],

@@ -6,10 +6,13 @@ A simple extension to enable several VS Code features for editing the MInDes inp
 
 ## Intro
 
-This extension is for MInDes input file. It is a modification on the VS Code extension example: [lsp-sample](https://github.com/microsoft/VS Code-extension-samples/tree/main/lsp-sample). 
+This extension is for MInDes input file. It is a modification on the VS Code extension example: [lsp-sample](https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample). 
 
-It adds completion and code grammar highlight for the keywords
-used in the input file.
+[MInDes](https://github.com/Microstructure-Intelligent-Design/MInDes) 
+([**M**aterial **In**telligent **Des**ign](https://github.com/Microstructure-Intelligent-Design)) 
+is a phase field simulation package using MInDes input file script to pass the simulation parameters to the program. 
+
+This extension attempts to add grammar support to this script language, includes completion and code grammar highlight for the keywords used in the input file.
 Please notice that this extension does not support complete VS Code features. 
 
 ## How to use it?

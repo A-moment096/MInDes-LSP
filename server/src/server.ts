@@ -4,6 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 import {
 	createConnection,
+	Diagnostic,
+	DiagnosticSeverity,
 	TextDocuments,
 	ProposedFeatures,
 	InitializeParams,
@@ -24,7 +26,27 @@ const connection = createConnection(ProposedFeatures.all);
 
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
+let hasConfigurationCapability = false;
+let hasWorkspaceFolderCapability = false;
+let hasDiagnosticRelatedInformationCapability = false;
+
 connection.onInitialize((params: InitializeParams) => {
+	const capabilities = params.capabilities;
+
+	// Does the client support the `workspace/configuration` request?
+	// If not, we fall back using global settings.
+	hasConfigurationCapability = !!(
+		capabilities.workspace && !!capabilities.workspace.configuration
+	);
+	hasWorkspaceFolderCapability = !!(
+		capabilities.workspace && !!capabilities.workspace.workspaceFolders
+	);
+	hasDiagnosticRelatedInformationCapability = !!(
+		capabilities.textDocument &&
+		capabilities.textDocument.publishDiagnostics &&
+		capabilities.textDocument.publishDiagnostics.relatedInformation
+	);
+
 	const result: InitializeResult = {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -33,7 +55,6 @@ connection.onInitialize((params: InitializeParams) => {
 				resolveProvider: true,
 				triggerCharacters: ['.']
 			},
-			hoverProvider: true
 		}
 	};
 	return result;
@@ -47,8 +68,50 @@ documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
 });
 
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-	// Perform validation if necessary
+//*disabled the diagnostics temporarily.
+async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
+	//* Perform validation if necessary
+	const settings = await getDocumentSettings(textDocument.uri);
+
+	//* The validator creates diagnostics for all uppercase words length 2 and more
+	const text = textDocument.getText();
+	const pattern = /\b[A-Z]{2,}\b/g;
+	let m: RegExpExecArray | null;
+
+	// let problems = 0;
+	const diagnostics: Diagnostic[] = [];
+	// while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+	// 	problems++;
+	// 	const diagnostic: Diagnostic = {
+	// 		severity: DiagnosticSeverity.Warning,
+	// 		range: {
+	// 			start: textDocument.positionAt(m.index),
+	// 			end: textDocument.positionAt(m.index + m[0].length)
+	// 		},
+	// 		message: `${m[0]} is all uppercase.`,
+	// 		source: 'ex'
+	// 	};
+	// 	if (hasDiagnosticRelatedInformationCapability) {
+	// 		diagnostic.relatedInformation = [
+	// 			{
+	// 				location: {
+	// 					uri: textDocument.uri,
+	// 					range: Object.assign({}, diagnostic.range)
+	// 				},
+	// 				message: 'Spelling matters'
+	// 			},
+	// 			{
+	// 				location: {
+	// 					uri: textDocument.uri,
+	// 					range: Object.assign({}, diagnostic.range)
+	// 				},
+	// 				message: 'Particularly for names'
+	// 			}
+	// 		];
+	// 	}
+	// 	diagnostics.push(diagnostic);
+	// }
+	return diagnostics;
 }
 
 // The example settings
@@ -75,6 +138,21 @@ connection.onDidChangeConfiguration(change => {
 	// to the existing setting, but this is out of scope for this example.
 	connection.languages.diagnostics.refresh();
 });
+
+function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
+	if (!hasConfigurationCapability) {
+		return Promise.resolve(globalSettings);
+	}
+	let result = documentSettings.get(resource);
+	if (!result) {
+		result = connection.workspace.getConfiguration({
+			scopeUri: resource,
+			section: 'MInDesServer'
+		});
+		documentSettings.set(resource, result);
+	}
+	return result;
+}
 
 // Only keep settings for open documents
 documents.onDidClose(e => {
@@ -125,13 +203,6 @@ connection.onCompletion(
 
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		// if (item.data === 1) {
-		// 	item.detail = 'TypeScript details';
-		// 	item.documentation = 'TypeScript documentation';
-		// } else if (item.data === 2) {
-		// 	item.detail = 'JavaScript details';
-		// 	item.documentation = 'JavaScript documentation';
-		// }
 		return item;
 	}
 );
