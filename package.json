@@ -17,17 +17,26 @@
 	"activationEvents": [],
 	"main": "./client/out/extension",
 	"contributes": {
-		"languages": [{
-			"id": "mindes",
-			"aliases": ["mindes", "mindes"],
-			"extensions": ["mindes"],
-			"configuration": "./language-configuration.json"
-		  }],
-		  "grammars": [{
-			"language": "mindes",
-			"scopeName": "source.mindes",
-			"path": "./syntaxes/mindes.tmLanguage.json"
-		  }],
+		"languages": [
+			{
+				"id": "mindes",
+				"aliases": [
+					"mindes",
+					"mindes"
+				],
+				"extensions": [
+					"mindes"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "mindes",
+				"scopeName": "source.mindes",
+				"path": "./syntaxes/mindes.tmLanguage.json"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "basic configuration",

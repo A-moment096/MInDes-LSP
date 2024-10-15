@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, ConfigurationTarget} from 'vscode';
 
 import {
 	LanguageClient,
@@ -40,6 +40,13 @@ export function activate(context: ExtensionContext) {
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
 	};
+	function updateFileAssociations() {
+		const configuration = workspace.getConfiguration();
+		const fileAssociations: { [key: string]: string } = configuration.get('files.associations') || {};
+		fileAssociations['input_report.txt'] = 'mindes';
+		configuration.update('files.associations', fileAssociations, ConfigurationTarget.Global);
+	}
+	updateFileAssociations();
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
