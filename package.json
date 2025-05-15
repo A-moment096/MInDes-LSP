@@ -1,14 +1,14 @@
 {
-	"name": "mindes-lsp",
+	"name": "mindes-language-pack",
 	"description": "A simple language server for MInDes script",
 	"author": "AMoment",
 	"license": "WTFPL",
-	"version": "0.1.0",
+	"version": "0.1.2",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/A-moment096/MInDes-LSP"
 	},
-	"publisher": "AMoment",
+	"publisher": "amoment096",
 	"categories": [],
 	"keywords": [],
 	"engines": {
