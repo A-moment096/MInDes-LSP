@@ -2,10 +2,10 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
+
 import {
 	createConnection,
 	Diagnostic,
-	DiagnosticSeverity,
 	TextDocuments,
 	ProposedFeatures,
 	InitializeParams,
@@ -13,129 +13,109 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult,
-	HoverParams,
+	InitializeResult
 } from 'vscode-languageserver/node';
+
+import { TextDocument } from 'vscode-languageserver-textdocument';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import {
-	TextDocument
-} from 'vscode-languageserver-textdocument';
+	SemanticTokensParams,
+	SemanticTokens,
+	SemanticTokensBuilder
+} from 'vscode-languageserver/node';
 
-import { readFileSync } from "fs";
-import { resolve } from "path";
+// Create LSP connection and document manager
 const connection = createConnection(ProposedFeatures.all);
-
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
+// Configuration capability flags
 let hasConfigurationCapability = false;
-let hasWorkspaceFolderCapability = false;
-let hasDiagnosticRelatedInformationCapability = false;
 
-connection.onInitialize((params: InitializeParams) => {
+// Default and document-specific settings
+interface ExampleSettings {
+	maxNumberOfProblems: number;
+}
+
+const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
+let globalSettings: ExampleSettings = defaultSettings;
+const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+
+// Load completions from external JSON
+let completionsList: Record<string, string[]> = {};
+try {
+	const completionsFile = readFileSync(resolve(__dirname, '../src/AutoCompletion.json'), 'utf-8');
+	completionsList = JSON.parse(completionsFile);
+	connection.console.log('Completions loaded from JSON file');
+} catch (error: any) {
+	connection.console.log(`Failed to read completions JSON file: ${error.message}`);
+}
+
+// Initialization handler
+connection.onInitialize((params: InitializeParams): InitializeResult => {
 	const capabilities = params.capabilities;
 
-	// Does the client support the `workspace/configuration` request?
-	// If not, we fall back using global settings.
 	hasConfigurationCapability = !!(
-		capabilities.workspace && !!capabilities.workspace.configuration
-	);
-	hasWorkspaceFolderCapability = !!(
-		capabilities.workspace && !!capabilities.workspace.workspaceFolders
-	);
-	hasDiagnosticRelatedInformationCapability = !!(
-		capabilities.textDocument &&
-		capabilities.textDocument.publishDiagnostics &&
-		capabilities.textDocument.publishDiagnostics.relatedInformation
+		capabilities.workspace && capabilities.workspace.configuration
 	);
 
-	const result: InitializeResult = {
+	return {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
-			// Tell the client that this server supports code completion.
 			completionProvider: {
 				resolveProvider: true,
 				triggerCharacters: ['.']
 			},
+			semanticTokensProvider: {
+				legend: {
+					tokenTypes: [
+						'subkey1', 'subkey2', 'subkey3', 'subkey4',
+						'subkey5', 'subkey6', 'subkey7', 'subkey8'
+					],
+					tokenModifiers: []
+				},
+				full: true
+			}
 		}
 	};
-	return result;
 });
 
 connection.onInitialized(() => {
 	connection.console.log('Server initialized');
 });
 
-documents.onDidChangeContent(change => {
-	validateTextDocument(change.document);
+connection.languages.semanticTokens.on((params: SemanticTokensParams): SemanticTokens => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) return { data: [] };
+
+	const builder = new SemanticTokensBuilder();
+	const lines = document.getText().split(/\r?\n/g);
+
+	for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+		const line = lines[lineIndex];
+
+		const keyMatch = line.match(/^([a-zA-Z0-9_.]+)\s*=/);
+		if (!keyMatch) continue;
+
+		const key = keyMatch[1];
+		const subkeys = key.split('.');
+
+		let charIndex = 0;
+		for (let i = 0; i < subkeys.length && i < 8; i++) {
+			const subkey = subkeys[i];
+			const tokenType = `subkey${i + 1}`; // subkey1 to subkey8
+
+			builder.push(lineIndex, charIndex, subkey.length, i, 0); // `i` is the tokenType index
+			charIndex += subkey.length + 1; // +1 for the dot
+		}
+	}
+
+	return builder.build();
 });
 
-//*disabled the diagnostics temporarily.
-async function validateTextDocument(textDocument: TextDocument): Promise<Diagnostic[]> {
-	//* Perform validation if necessary
-	const settings = await getDocumentSettings(textDocument.uri);
-
-	//* The validator creates diagnostics for all uppercase words length 2 and more
-	const text = textDocument.getText();
-	const pattern = /\b[A-Z]{2,}\b/g;
-	let m: RegExpExecArray | null;
-
-	// let problems = 0;
-	const diagnostics: Diagnostic[] = [];
-	// while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-	// 	problems++;
-	// 	const diagnostic: Diagnostic = {
-	// 		severity: DiagnosticSeverity.Warning,
-	// 		range: {
-	// 			start: textDocument.positionAt(m.index),
-	// 			end: textDocument.positionAt(m.index + m[0].length)
-	// 		},
-	// 		message: `${m[0]} is all uppercase.`,
-	// 		source: 'ex'
-	// 	};
-	// 	if (hasDiagnosticRelatedInformationCapability) {
-	// 		diagnostic.relatedInformation = [
-	// 			{
-	// 				location: {
-	// 					uri: textDocument.uri,
-	// 					range: Object.assign({}, diagnostic.range)
-	// 				},
-	// 				message: 'Spelling matters'
-	// 			},
-	// 			{
-	// 				location: {
-	// 					uri: textDocument.uri,
-	// 					range: Object.assign({}, diagnostic.range)
-	// 				},
-	// 				message: 'Particularly for names'
-	// 			}
-	// 		];
-	// 	}
-	// 	diagnostics.push(diagnostic);
-	// }
-	return diagnostics;
-}
-
-// The example settings
-interface ExampleSettings {
-	maxNumberOfProblems: number;
-}
-
-// The global settings, used when the `workspace/configuration` request is not supported by the client.
-// Please note that this is not the case when using this server with the client provided in this example
-// but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
-let globalSettings: ExampleSettings = defaultSettings;
-
-// Cache the settings of all open documents
-const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
-
+// Handle configuration changes
 connection.onDidChangeConfiguration(change => {
-
-	globalSettings = <ExampleSettings>(
-		(change.settings.MInDesServer || defaultSettings)
-	);
-	// Refresh the diagnostics since the `maxNumberOfProblems` could have changed.
-	// We could optimize things here and re-fetch the setting first can compare it
-	// to the existing setting, but this is out of scope for this example.
+	globalSettings = <ExampleSettings>(change.settings.MInDesServer || defaultSettings);
 	connection.languages.diagnostics.refresh();
 });
 
@@ -143,6 +123,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	if (!hasConfigurationCapability) {
 		return Promise.resolve(globalSettings);
 	}
+
 	let result = documentSettings.get(resource);
 	if (!result) {
 		result = connection.workspace.getConfiguration({
@@ -154,25 +135,21 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	return result;
 }
 
-// Only keep settings for open documents
+// Document lifecycle handlers
+documents.onDidChangeContent(change => {
+	validateTextDocument(change.document);
+});
+
 documents.onDidClose(e => {
 	documentSettings.delete(e.document.uri);
 });
 
-connection.onDidChangeWatchedFiles(_change => {
-	// Monitored files have change in VSCode
-	connection.console.log('We received a file change event');
-});
-
-let completionsList: Record<string, string[]> = {};
-try {
-	const completionsFile = readFileSync(resolve(__dirname, "../src/AutoCompletion.json"), "utf-8");
-	completionsList = JSON.parse(completionsFile);
-	connection.console.log("Completions loaded from JSON file");
-} catch (error) {
-	connection.console.log("Failed to read completions JSON file: ${error.message}");
+// Simplified validator (disabled diagnostics)
+async function validateTextDocument(_textDocument: TextDocument): Promise<Diagnostic[]> {
+	return [];
 }
 
+// Completion support
 function getCompletionItems(path: string): CompletionItem[] {
 	const items = completionsList[path] || [];
 	return items.map(item => ({
@@ -181,37 +158,27 @@ function getCompletionItems(path: string): CompletionItem[] {
 	}));
 }
 
-// This handler provides the initial list of the completion items.
-connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-		const document = documents.get(_textDocumentPosition.textDocument.uri);
-		const position = _textDocumentPosition.position;
-		if (!document) {
-			return [];
-		}
-		const text = document.getText({
-			start: { line: position.line, character: 0 },
-			end: position
-		});
+connection.onCompletion((params: TextDocumentPositionParams): CompletionItem[] => {
+	const document = documents.get(params.textDocument.uri);
+	const position = params.position;
 
-		const segments = text.split('.').map(segment => segment.trim());
-		const path = segments.slice(0, -1).join('.');
+	if (!document) return [];
 
-		return getCompletionItems(path);
-	}
-);
+	const text = document.getText({
+		start: { line: position.line, character: 0 },
+		end: position
+	});
 
-connection.onCompletionResolve(
-	(item: CompletionItem): CompletionItem => {
-		return item;
-	}
-);
+	const segments = text.split('.').map(segment => segment.trim());
+	const path = segments.slice(0, -1).join('.');
 
-// connection.onHover((param:HoverParams):CompletionItem=>{return param})
+	return getCompletionItems(path);
+});
 
-// Make the text document manager listen on the connection
-// for open, change and close text document events
+connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
+	return item;
+});
+
+// Start listening to LSP events
 documents.listen(connection);
-
-// Listen on the connection
 connection.listen();
