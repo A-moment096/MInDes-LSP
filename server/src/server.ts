@@ -1,8 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
-
 import {
 	createConnection,
 	Diagnostic,
@@ -94,7 +89,7 @@ connection.languages.semanticTokens.on((params: SemanticTokensParams): SemanticT
 	for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
 		const line = lines[lineIndex];
 
-		const keyMatch = line.match(/^([a-zA-Z0-9_.]+)\s*=/);
+		const keyMatch = line.match(/^([a-zA-Z0-9_.|]+)\s*=/);
 		if (!keyMatch) continue;
 
 		const key = keyMatch[1];

@@ -15,6 +15,34 @@ import {
 
 let client: LanguageClient;
 
+function updateFileAssociations() {
+	const configuration = workspace.getConfiguration();
+	const fileAssociations: { [key: string]: string } = configuration.get('files.associations') || {};
+	fileAssociations['input_report.txt'] = 'mindes';
+	configuration.update('files.associations', fileAssociations, ConfigurationTarget.Global);
+}
+
+function assignKeyColor() {
+	const config = workspace.getConfiguration('mindes');
+	const enabled = config.get<boolean>('semanticHighlighting');
+	const color = config.get<string[]>('semanticTokenColors');
+
+	if (!enabled || !color) return;
+
+	const colorRules = Object.fromEntries(
+		Object.keys(color).map(subkey => [
+			subkey,
+			{ foreground: color[subkey] }
+		])
+	);
+
+	workspace.getConfiguration().update(
+		'editor.semanticTokenColorCustomizations',
+		{ rules: colorRules },
+		ConfigurationTarget.Global
+	);
+}
+
 export function activate(context: ExtensionContext) {
 	// The server is implemented in node
 	const serverModule = context.asAbsolutePath(
@@ -43,13 +71,9 @@ export function activate(context: ExtensionContext) {
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
 	};
-	function updateFileAssociations() {
-		const configuration = workspace.getConfiguration();
-		const fileAssociations: { [key: string]: string } = configuration.get('files.associations') || {};
-		fileAssociations['input_report.txt'] = 'mindes';
-		configuration.update('files.associations', fileAssociations, ConfigurationTarget.Global);
-	}
+
 	updateFileAssociations();
+	assignKeyColor();
 
 	// Create the language client and start the client.
 	client = new LanguageClient(

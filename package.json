@@ -39,7 +39,7 @@
 		],
 		"configuration": {
 			"type": "object",
-			"title": "basic configuration",
+			"title": "MInDes Configuration",
 			"properties": {
 				"MInDesServer.maxNumberOfProblems": {
 					"scope": "resource",
@@ -57,6 +57,43 @@
 					],
 					"default": "off",
 					"description": "Traces the communication between VS Code and the language server."
+				},
+				"mindes.semanticHighlighting": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable custom semantic highlighting for MInDes scripts"
+				},
+				"mindes.semanticTokenColors.subkey1": {
+					"type": "string",
+					"default": "#FF6B6B"
+				},
+				"mindes.semanticTokenColors.subkey2": {
+					"type": "string",
+					"default": "#F4A261"
+				},
+				"mindes.semanticTokenColors.subkey3": {
+					"type": "string",
+					"default": "#E9C46A"
+				},
+				"mindes.semanticTokenColors.subkey4": {
+					"type": "string",
+					"default": "#2A9D8F"
+				},
+				"mindes.semanticTokenColors.subkey5": {
+					"type": "string",
+					"default": "#38BDF8"
+				},
+				"mindes.semanticTokenColors.subkey6": {
+					"type": "string",
+					"default": "#4C6EF5"
+				},
+				"mindes.semanticTokenColors.subkey7": {
+					"type": "string",
+					"default": "#9B5DE5"
+				},
+				"mindes.semanticTokenColors.subkey8": {
+					"type": "string",
+					"default": "#F15BB5"
 				}
 			}
 		},
@@ -85,17 +122,7 @@
 			{
 				"id": "subkey8"
 			}
-		],
-		"semanticTokenColors": {
-			"subkey1": "#FF0000",
-			"subkey2": "#FF9900",
-			"subkey3": "#FFFF00",
-			"subkey4": "#00FF00",
-			"subkey5": "#00FFFF",
-			"subkey6": "#0000FF",
-			"subkey7": "#9900FF",
-			"subkey8": "#FF00FF"
-		}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

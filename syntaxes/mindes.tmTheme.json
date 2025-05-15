@@ -1,0 +1,12 @@
+{
+	"name": "mindes theme",
+	"settings": [
+		{
+			"scope": "string.unquoted",
+			"settings": {
+				"foreground": "#FF0000",
+				"fontStyle": "bold"
+			}
+		}
+	]
+}

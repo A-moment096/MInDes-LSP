@@ -25,6 +25,17 @@
 		{
 			"name": "keyword.operator.assignment",
 			"match": "="
+		},
+		{
+			"begin": "\\s*[^#].*path.*=",
+			"end": "$",
+			"contentName": "variable.path",
+			"patterns": [
+				{
+					"name": "string",
+					"match": ".+"
+				}
+			]
 		}
 	],
 	"repository": {
