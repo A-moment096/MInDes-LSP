@@ -8,17 +8,16 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult
+	InitializeResult,
+	SemanticTokensParams,
+	SemanticTokens,
+	SemanticTokensBuilder
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import {
-	SemanticTokensParams,
-	SemanticTokens,
-	SemanticTokensBuilder
-} from 'vscode-languageserver/node';
+import { debug, log } from 'console';
 
 // Create LSP connection and document manager
 const connection = createConnection(ProposedFeatures.all);
@@ -89,13 +88,26 @@ connection.languages.semanticTokens.on((params: SemanticTokensParams): SemanticT
 	for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
 		const line = lines[lineIndex];
 
-		const keyMatch = line.match(/^([a-zA-Z0-9_.|]+)\s*=/);
-		if (!keyMatch) continue;
+		const debugStyleLine = line.match(/^\d+.*\|.*\|(.*)=/);
+		const logStyleLine = line.match(/^> \[.*?\] (.*)=/);
+		const scriptLine = line.match(/^\s*([a-zA-Z0-9_.| ]+)\s*=/);
+
+		let keyMatch: RegExpMatchArray;
+		if (debugStyleLine) {
+			keyMatch = debugStyleLine;
+		} else if (logStyleLine) {
+			keyMatch = logStyleLine;
+		} else if (scriptLine) {
+			keyMatch = scriptLine;
+		} else {
+			continue;
+		}
+
+		let charIndex = keyMatch[0].length - keyMatch[1].length - 1;
 
 		const key = keyMatch[1];
 		const subkeys = key.split('.');
 
-		let charIndex = 0;
 		for (let i = 0; i < subkeys.length && i < 8; i++) {
 			const subkey = subkeys[i];
 			const tokenType = `subkey${i + 1}`; // subkey1 to subkey8
