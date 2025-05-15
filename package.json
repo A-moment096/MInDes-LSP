@@ -2,6 +2,7 @@
 	"name": "mindes-language-pack",
 	"description": "A simple language server for MInDes script",
 	"author": "AMoment",
+	"icon": "images/MInDes_Icon.jpg",
 	"license": "WTFPL",
 	"version": "0.1.2",
 	"repository": {
