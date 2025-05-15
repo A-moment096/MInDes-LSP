@@ -19,10 +19,6 @@
 			"match": "\\b[0-9]+\\b"
 		},
 		{
-			"name": "constant.character.escape",
-			"match": "\\\\."
-		},
-		{
 			"name": "variable.other",
 			"match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
 		},

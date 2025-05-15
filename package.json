@@ -27,7 +27,7 @@
 				"extensions": [
 					"mindes"
 				],
-				"configuration": "./language-configuration.json"
+				"configuration": "./syntaxes/language-configuration.json"
 			}
 		],
 		"grammars": [
@@ -59,6 +59,42 @@
 					"description": "Traces the communication between VS Code and the language server."
 				}
 			}
+		},
+		"semanticTokenTypes": [
+			{
+				"id": "subkey1"
+			},
+			{
+				"id": "subkey2"
+			},
+			{
+				"id": "subkey3"
+			},
+			{
+				"id": "subkey4"
+			},
+			{
+				"id": "subkey5"
+			},
+			{
+				"id": "subkey6"
+			},
+			{
+				"id": "subkey7"
+			},
+			{
+				"id": "subkey8"
+			}
+		],
+		"semanticTokenColors": {
+			"subkey1": "#FF0000",
+			"subkey2": "#FF9900",
+			"subkey3": "#FFFF00",
+			"subkey4": "#00FF00",
+			"subkey5": "#00FFFF",
+			"subkey6": "#0000FF",
+			"subkey7": "#9900FF",
+			"subkey8": "#FF00FF"
 		}
 	},
 	"scripts": {
