@@ -4,7 +4,8 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext, ConfigurationTarget } from 'vscode';
+import { workspace, commands, ExtensionContext, ConfigurationTarget } from 'vscode';
+import { runExtractInputCommand, extractRawInputFile, extractFullInputFile } from './parseInputReport';
 
 import {
 	LanguageClient,
@@ -47,6 +48,13 @@ export function activate(context: ExtensionContext) {
 	// The server is implemented in node
 	const serverModule = context.asAbsolutePath(
 		path.join('server', 'out', 'server.js')
+	);
+
+	context.subscriptions.push(
+		commands.registerCommand('mindes.extractRawInputFromReport', () => runExtractInputCommand(extractRawInputFile))
+	);
+	context.subscriptions.push(
+		commands.registerCommand('mindes.extractFullInputFromReport', () => runExtractInputCommand(extractFullInputFile))
 	);
 
 	// If the extension is launched in debug mode then the debug server options are used
