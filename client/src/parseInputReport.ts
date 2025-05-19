@@ -9,7 +9,7 @@ export const matchDebugRAW = /^\d+.*\|.*\|(.*)$/;
 export const matchDebugSeparator = /^-+$/;
 export const matchDebugTableHead = /^[A-Z0-9. ]+\s*\|.*$/;
 export const matchDebugToken = /^\d+.*\|.*\|{"(.*)"}, {"(.*)"}, {"(.*)"}$/;
-export const matchPrompts = /^>\s*\[.*\]\s(.*)|^\s*(#.*)$/;
+export const matchPrompts = /^>\s*\[.*\]\s([^{}()[\]]*\s*=.*)|^\s*(#.*)$/;
 
 type Section = 'none' | 'macros' | 'debug' | 'inputs' | 'tokens' | 'variables' | 'functions';
 
